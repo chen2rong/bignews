@@ -2,7 +2,8 @@ $(function () {
     // 1、发送Ajax请求
     $.ajax({
         type: 'get',
-        url: 'http://localhost:8080/api/v1/admin/user/info',
+        // url: 'http://localhost:8080/api/v1/admin/user/info',
+        url: BigNew.user_info,
         // 设置请求头，将本地存储的token发送给服务器，用于验证用户是否已经登录
         headers: {
             'Authorization': window.localStorage.getItem('token')
