@@ -19,4 +19,14 @@ $(function () {
             }
         }
     })
+
+    // 退出登录功能
+    $('.user_center_link .logout').on('click', function () {
+        console.log(123);
+
+        // 1、清除localStorage的数据
+        localStorage.removeItem('token')
+        // 2、跳回登录页
+        location.href = './login.html'
+    })
 })
