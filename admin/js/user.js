@@ -2,9 +2,9 @@ $(function () {
     $.ajax({
         type: 'get',
         url: BigNew.user_detail,
-        headers: {
+        /* headers: {
             'Authorization': localStorage.getItem('token')
-        },
+        }, */
         success: function (res) {
             // 数据回显
             $('#form .username').val(res.data.username)
@@ -31,9 +31,9 @@ $(function () {
         $.ajax({
             type: 'post',
             url: BigNew.user_edit,
-            headers: {
+            /* headers: {
                 'Authorization': localStorage.getItem('token')
-            },
+            }, */
             data: data,
             contentType: false,
             processData: false,
@@ -49,9 +49,9 @@ $(function () {
                         // url: 'http://localhost:8080/api/v1/admin/user/info',
                         url: BigNew.user_info,
                         // 设置请求头，将本地存储的token发送给服务器，用于验证用户是否已经登录
-                        headers: {
+                        /* headers: {
                             'Authorization': window.localStorage.getItem('token')
-                        },
+                        }, */
                         success: function (obj) {
                             // 2、请求回来的数据要渲染到页面
                             if (obj.code == 200) {
