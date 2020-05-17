@@ -30,4 +30,24 @@ $(function () {
         // 2、跳回登录页
         location.href = './login.html'
     })
+
+    // 点击左侧导航栏添加active高亮样式
+    $('.menu .level01').on('click', function () {
+        // 1、点击给当前div添加active类，其他删除该类
+        $(this).addClass('active').siblings().removeClass('active')
+        // 2、点击第二个让ul实现显示切换显示和隐藏
+        if ($(this).index() == 1) {
+            $('.menu .level02').slideToggle()
+            // 让>实现旋转效果
+            $(this).find('b').toggleClass('rotate0')
+            // 使用触发器让level02的li默认第一个高亮显示
+            $('.menu .level02 li:eq(0)').trigger('click')
+        }
+
+    })
+
+    // 点击level02的ul添加高亮效果
+    $('.menu .level02 li').on('click', function () {
+        $(this).addClass('active').siblings().removeClass('active')
+    })
 })
