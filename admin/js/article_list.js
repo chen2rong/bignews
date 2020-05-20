@@ -1,97 +1,196 @@
+// 完善封装
 $(function () {
-    // 1、进入页面先获取所有文章类别
+    // 1、进入页面先获取所有文章分类
     $.ajax({
         type: 'get',
         url: BigNew.category_list,
         success: function (res) {
             if (res.code == 200) {
-                // 将数据绑定在模板上
+                // 1.1将数据绑定在模板上
                 var htmlStr = template('sel_Category', res)
-                // 将数据渲染到页面上
+                // 1.2将数据渲染到页面上
                 $('#selCategory').html(htmlStr)
             }
         }
-    })
+    }) //获取文章分类的请求
 
-    // 2、将文章信息列表显示在页面上
-    // 调用封装的请求文章列表的函数
-    getDataByParams({
-        key: $('#key').val(),
-        type: $('#selCategory').val(),
-        state: $('#selStatus').val(),
-        page: 1,
-        perpage: 6
-    })
-    function getDataByParams(obj) {
+    // 5、封装一个文章列表页发送请求渲染页面的函数
+    function getDataByParams(mypage, callback) { //第一个参数：初始页码  第二个参数：回调函数
         $.ajax({
             type: 'get',
             url: BigNew.article_query,
             data: {
-                // 搜索关键词，可以为空，为空返回某类型所有文章
-                key: obj.key,
-                // 文章类型id，可以为空，为空返回所有类型文章
-                type: obj.type,
-                // 文章状态，草稿 ，已发布,为空返回所有状态文章
-                state: obj.state,
-                // 当前页，为空返回第1页
-                page: obj.page,
-                // 每页显示条数，为空默认每页6条
-                perpage: obj.perpage
+                key: $('#key').val(), // 搜索关键词
+                type: $('#selCategory').val(), // 文章类型id
+                state: $('#selStatus').val(),// 文章状态，草稿/已发布
+                page: mypage, // 当前页，由于page是会变化的，所以由参数mypage控制
+                perpage: 7 // 每页显示条数
             },
             success: function (res) {
                 if (res.code == 200) {
-                    // 将数据绑定在模板上
+                    // 5.2将数据绑定在模板上
                     var htmlStr = template('listCategory', res.data)
-                    // 将数据渲染到页面上
+                    // 5.3将数据渲染到页面上
                     $('.table-striped tbody').html(htmlStr)
-                }
 
-                // 4.1、在页面数据加载渲染完成后再显示分页
-                pagination(res.data.totalPage, 6)
-            }  //成功请求的回调函数
-        })
-    } //封装的getDataByParams函数
-    // 同步筛选和点击分页的页码
-    window.index = 1
-    // 3、根据条件筛选文章
-    $('.form-inline').on('submit', function (e) {
-        // 3.1、阻止表单默认提交行为
-        e.preventDefault()
-        // 3.2、获取筛选条件上对应的value值筛选出对应的信息
-        getDataByParams({
-            key: $('#key').val(),
-            type: $('#selCategory').val(),
-            state: $('#selStatus').val(),
-            page: index,
-            perpage: 6
-        })
-    })
+                    // 5.4、返回一个参数传入的回调函数，用来控制数据渲染后的后续操作
+                    // 判断：5.4.1 当请求返回的总条数为0时，隐藏分页控件，提示没有数据
+                    if (res.data.totalPage == 0) {
+                        $('#pagination-demo').hide().next().show()
+                    } else if (res.data.totalPage != 0 && callback != null) { //说明有数据回来
+                        $('#pagination-demo').show().next().hide()
+                        callback(res)  //执行函数，并将res作为实参传入
+                    }
+                }  //if判断
+            }  // success函数
+        })  //ajax请求
+    }
 
+    // 2、当跳转到文章列表页要发送请求渲染页面
+    // 2.1发送Ajax请求
+    getDataByParams(1, pagination)
 
-
-    // 4、封装引入分页插件的js代码
-    function pagination(totalPages, visiblePages) {
+    // 3、封装分页功能
+    function pagination(res) {
         $('#pagination-demo').twbsPagination({
-            totalPages: totalPages,
-            visiblePages: visiblePages || 7,
+            totalPages: res.data.totalPage, //总页数
+            visiblePages: 7,  //每页显示数量
             initiateStartPageClick: false,
             first: "首页",
             prev: "上一页",
             next: "下一页",
             last: "尾页",
-            onPageClick: function (event, page) {
-                // console.log(event, page);
-                // 同步筛选页码
-                index = page
-                getDataByParams({
-                    key: $('#key').val(),
-                    type: $('#selCategory').val(),
-                    state: $('#selStatus').val(),
-                    page: page,
-                    perpage: 6
-                })
+            onPageClick: function (event, page) {  //页码发生改变时触发
+                // 重复的代码
+                // 发送ajax请求
+                getDataByParams(page, null)
             }
-        });  //分页
+        });
     }
 
-})  //入口函数
+    // 4、筛选功能
+    // 4.1点击筛选按钮发送请求
+    $('.form-inline').on('submit', function (e) {
+        // 4.2、阻止表单默认提交行为
+        e.preventDefault()
+        // 4.3、获取筛选条件上对应的value值筛选出对应的信息
+        getDataByParams(1, function (res) {
+            /* 服务器端的数据响应回来之后，要更新分页控件，也就是更新总页码
+               使用一个事件changeTotalPages，动态的改变总页数  内部底层就会重绘分页控件
+               第一个参数：事件名称  第二个参数：是总页码  第三个参数：默认当前页 */
+            $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1)
+        })
+    })
+})
+
+/* $(function () {
+    // 1、进入页面先获取所有文章分类
+    $.ajax({
+        type: 'get',
+        url: BigNew.category_list,
+        success: function (res) {
+            if (res.code == 200) {
+                // 1.1将数据绑定在模板上
+                var htmlStr = template('sel_Category', res)
+                // 1.2将数据渲染到页面上
+                $('#selCategory').html(htmlStr)
+            }
+        }
+    }) //获取文章分类的请求
+
+    // 2、当跳转到文章列表页要发送请求渲染页面
+    // 2.1发送Ajax请求
+    $.ajax({
+        type: 'get',
+        url: BigNew.article_query,
+        data: {
+            key: $('#key').val(), // 搜索关键词
+            type: $('#selCategory').val(), // 文章类型id
+            state: $('#selStatus').val(),// 文章状态，草稿/已发布
+            page: 1, // 当前页
+            perpage: 7 // 每页显示条数
+        }, //data数据
+        success: function (res) {
+            if (res.code == 200) {
+                // 2.2将数据绑定在模板上
+                var htmlStr = template('listCategory', res.data)
+                // 2.3将数据渲染到页面上
+                $('.table-striped tbody').html(htmlStr)
+
+                // 2.4、显示分页插件 --不同的地方
+                pagination(res.data.totalPage, 6)
+            }  //if判断
+        }  // success函数
+    })  //ajax请求
+
+    // 3、封装分页功能
+    function pagination(res) {
+        $('#pagination-demo').twbsPagination({
+            totalPages: res.data.totalPage, //总页数
+            visiblePages: 7,  //每页显示数量
+            initiateStartPageClick: false,
+            first: "首页",
+            prev: "上一页",
+            next: "下一页",
+            last: "尾页",
+            onPageClick: function (event, page) {  //页码发生改变时触发
+                // 重复的代码
+                // 发送ajax请求
+                 $.ajax({
+                     type: 'get',
+                     url: BigNew.article_query,
+                     data: {
+                         key: $('#key').val(), // 搜索关键词
+                         type: $('#selCategory').val(), // 文章类型id
+                         state: $('#selStatus').val(),// 文章状态，草稿/已发布
+                         page: page, // 当前页
+                         perpage: 7 // 每页显示条数
+                     }, //data数据
+                     success: function (res) {
+                         if (res.code == 200) {
+                             // 2.2将数据绑定在模板上
+                             var htmlStr = template('listCategory', res.data)
+                             // 2.3将数据渲染到页面上
+                             $('.table-striped tbody').html(htmlStr)
+                         }  //if判断
+                     }  // success函数
+                 })  //ajax请求
+            }
+        });
+    }
+
+    // 4、筛选功能
+    // 4.1点击筛选按钮发送请求
+    $('.form-inline').on('submit', function (e) {
+        // 4.2、阻止表单默认提交行为
+        e.preventDefault()
+        // 4.3、获取筛选条件上对应的value值筛选出对应的信息
+         $.ajax({
+             type: 'get',
+             url: BigNew.article_query,
+             data: {
+                 key: $('#key').val(), // 搜索关键词
+                 type: $('#selCategory').val(), // 文章类型id
+                 state: $('#selStatus').val(),// 文章状态，草稿/已发布
+                 page: 1, // 当前页
+                 perpage: 7 // 每页显示条数
+             }, //data数据
+             success: function (res) {
+                 if (res.code == 200) {
+                     // 4.4将数据绑定在模板上
+                     var htmlStr = template('listCategory', res.data)
+                     // 4.5将数据渲染到页面上
+                     $('.table-striped tbody').html(htmlStr)
+
+                     // 4.6更新控件的总页码
+                     //  服务器端的数据响应回来之后，要更新分页控件，也就是更新总页码
+                     // 使用一个事件changeTotalPages，动态的改变总页数  内部底层就会重绘分页控件
+                     // 第一个参数：事件名称  第二个参数：是总页码  第三个参数：默认当前页
+                     $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1)
+
+                 }  //if判断
+             }  // success函数
+         })  //ajax请求
+    })
+
+}) */
