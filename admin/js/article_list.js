@@ -24,10 +24,12 @@ $(function () {
                 type: $('#selCategory').val(), // 文章类型id
                 state: $('#selStatus').val(),// 文章状态，草稿/已发布
                 page: mypage, // 当前页，由于page是会变化的，所以由参数mypage控制
-                perpage: 7 // 每页显示条数
+                perpage: 7// 每页显示条数
             },
             success: function (res) {
                 if (res.code == 200) {
+                    console.log(res);
+
                     // 5.2将数据绑定在模板上
                     var htmlStr = template('listCategory', res.data)
                     // 5.3将数据渲染到页面上
@@ -40,6 +42,10 @@ $(function () {
                     } else if (res.data.totalPage != 0 && callback != null) { //说明有数据回来
                         $('#pagination-demo').show().next().hide()
                         callback(res)  //执行函数，并将res作为实参传入
+                    } else if (res.data.totalPage != 0 && res.data.data.length == 0) {
+                        //删除的时候如果是将最后一页的数据都删了，则需要将存入的当前页码-1，在重新加载控件
+                        delpage -= 1
+                        $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, delpage)
                     }
                 }  //if判断
             }  // success函数
@@ -51,6 +57,8 @@ $(function () {
     getDataByParams(1, pagination)
 
     // 3、封装分页功能
+    // 设置一个全局变量，用来同步点击的分码
+    var delpage = 1
     function pagination(res) {
         $('#pagination-demo').twbsPagination({
             totalPages: res.data.totalPage, //总页数
@@ -61,7 +69,9 @@ $(function () {
             next: "下一页",
             last: "尾页",
             onPageClick: function (event, page) {  //页码发生改变时触发
-                // 重复的代码
+                // 同步点击的页码（删除功能需要）
+                delpage = page
+
                 // 发送ajax请求
                 getDataByParams(page, null)
             }
@@ -81,7 +91,42 @@ $(function () {
             $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, 1)
         })
     })
-})
+
+
+    // 5、删除功能
+    // 5、1通过模态框的show.bs.modal事件在点击删除按钮时获取文章id
+    // 5、2给删除模态框的确认按钮注册事件
+    // 5.3根据文章id删除对象的数据
+    // 5.4删除后需要重新发送请求，并且当前页是删除前的页码
+
+    // 5、1通过模态框的show.bs.modal事件在点击删除按钮时获取文章id
+    var id;
+    $('#delModal').on('show.bs.modal', function (e) {
+        id = $(e.relatedTarget).data('id')
+    })
+
+    // 5、2给删除模态框的确认按钮注册事件
+    $('#delModal .btn-primary').on('click', function () {
+        // 5.3根据文章id删除对象的数据
+        $.ajax({
+            type: 'post',
+            url: BigNew.article_delete,
+            data: { id: id },
+            success: function (res) {
+                if (res.code == 204) {
+                    // 5.4关闭模态框
+                    $('#delModal').modal('hide')
+                    // 5.5重新发送请求，并且当前页是删除前的页码
+                    getDataByParams(delpage, null)
+                }
+            }
+        })
+
+    })
+})  //入口函数
+
+
+
 
 /* $(function () {
     // 1、进入页面先获取所有文章分类

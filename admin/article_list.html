@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="./css/iconfont.css">
     <link rel="stylesheet" href="./css/main.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
+    <!-- 引入bootstrap.js文件 -->
+    <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <!-- 引入分页插件的js文件 -->
     <script src="./libs/jquery.twbsPagination.js"></script>
     <!-- 引入模板引擎js文件 -->
@@ -85,6 +87,27 @@
         </div>
     </div>
 
+    <!-- 删除按钮的模态框 -->
+    <div class="modal fade" id="delModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">温馨提示</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您确认要删除吗</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
     <!-- 创建筛选条件所有分类的模板 -->
     <script type="text/selCategory" id="sel_Category">
         <option value="">所有分类</option>
@@ -105,7 +128,7 @@
             <td class="text-center">{{value.state}}</td>
             <td class="text-center">
                 <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
+                <button data-id="{{value.id}}" class="btn btn-danger btn-xs delete" data-toggle="modal" data-target="#delModal" >删除</button>
             </td>
         </tr>
         {{/each}}
