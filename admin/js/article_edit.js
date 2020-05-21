@@ -15,36 +15,41 @@ $(function () {
         data: { id: obj.id },
         success: function (res) {
             if (res.code == 200) {
-                window.categoryId = res.data.categoryId
                 $('input[name="title"]').val(res.data.title)
                 $('.article_cover').attr('src', res.data.cover)
                 // $('input[name="title"]').val(res.data.title)
-                $('input[name="date"]').val(res.data.date)
+                $('#testico').val(res.data.date)
                 $('textarea[name="content"]').val(res.data.content)
+
+                var categoryId = res.data.categoryId
+                // 文章渲染完毕之后，再来渲染默认的分类
+                // 2,1、进入页面，发送Ajax请求获取所有文章分类
+                $.ajax({
+                    type: 'get',
+                    url: BigNew.category_list,
+                    success: function (res) {
+                        if (res.code == 200) {
+                            // 2.2将文章的默认分类存到响应回来的对象中（js是动态弱类型语言，可以随时点出来属性或方法）
+                            res.categoryId = categoryId
+                            // 2.3将数据绑定在模板上
+                            var htmlStr = template('categoryList', res)
+                            // 2.4将数据渲染到页面上
+                            $('.category').html(htmlStr)
+                        }
+                    }
+                }) //获取文章分类的请求
+
             }
 
         }
     })
 
-    // 3、进入页面先获取所有文章分类
-    $.ajax({
-        type: 'get',
-        url: BigNew.category_list,
-        success: function (res) {
-            if (res.code == 200) {
-                // 3.1将数据绑定在模板上
-                var htmlStr = template('categoryList', res)
-                // 3.2将数据渲染到页面上
-                $('.category').html(htmlStr)
-
-                $('.category option').each(function (index, ele) {
-                    if ($(ele).val() == categoryId) {
-                        $(ele).prop('selected', true).siblings().prop('selected', false)
-                    }
-                })
-            }
-        }
-    }) //获取文章分类的请求
+    // 3、点击input表单显示时间控件
+    jeDate("#testico", {
+        format: "YYYY-MM-DD",
+        isTime: false,
+        minDate: "2014-09-19 00:00:00"
+    })
 
 
 
