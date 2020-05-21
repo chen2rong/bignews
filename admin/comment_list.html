@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="css/main.css">
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <script src="./libs/template-web.js"></script>
+  <!-- 引入分页插件的js文件 -->
+  <script src="./libs/jquery.twbsPagination.js"></script>
   <!-- 引入http.js  ->接口连接 -->
   <script src="./js/http.js"></script>
   <!-- 引入article_release.js文件 -->
@@ -51,20 +53,8 @@
         </tbody>
       </table>
       <div class="row text-center">
-        <ul class="pagination pagination-sm">
-          <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
-          <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
-          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-          <li class="page-item"><a href="#" class="page-link">2</a></li>
-          <li class="page-item"><a href="#" class="page-link">3</a></li>
-          <li class="page-item"><a href="#" class="page-link">4</a></li>
-          <li class="page-item"><a href="#" class="page-link">5</a></li>
-          <li class="page-item"><a href="#" class="page-link">6</a></li>
-          <li class="page-item"><a href="#" class="page-link">7</a></li>
-          <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
-          <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
-        </ul>
-        <ul id="pagination" class="pagination-sm"></ul>
+        <ul id="pagination-demo" class="pagination-sm"></ul>
+        <p>一条数据都没有...</p>
       </div>
 
     </div>
@@ -87,8 +77,9 @@
         <td>已拒绝</td>
         {{/if}}
         <td class="text-center">
-          <a href="javascript:void(0);;" class="btn btn-warning btn-xs" value="{{value.id}}">拒绝</a>
-          <a href="javascript:void(0);;" class="btn btn-danger btn-xs" value="{{value.id}}">删除</a>
+          <a href="javascript:void(0);;" class="btn btn-warning btn-xs btn-pass" data-id="{{value.id}}">通过</a>
+          <a href="javascript:void(0);;" class="btn btn-warning btn-xs btn-refuse" data-id="{{value.id}}">拒绝</a>
+          <a href="javascript:void(0);;" class="btn btn-danger btn-xs" data-id="{{value.id}}">删除</a>
         </td>
       </tr>
     {{/each}}
