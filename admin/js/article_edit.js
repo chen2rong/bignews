@@ -17,9 +17,10 @@ $(function () {
             if (res.code == 200) {
                 $('input[name="title"]').val(res.data.title)
                 $('.article_cover').attr('src', res.data.cover)
-                // $('input[name="title"]').val(res.data.title)
+                // 时间控件的内容回显
                 $('#testico').val(res.data.date)
-                $('textarea[name="content"]').val(res.data.content)
+                // 富文本编辑器的内容回显
+                editor2.txt.html(res.data.content)
 
                 var categoryId = res.data.categoryId
                 // 文章渲染完毕之后，再来渲染默认的分类
@@ -38,7 +39,6 @@ $(function () {
                         }
                     }
                 }) //获取文章分类的请求
-
             }
 
         }
@@ -51,7 +51,96 @@ $(function () {
         minDate: "2014-09-19 00:00:00"
     })
 
+    // 4、使用wangEditor富文本
+    var E = window.wangEditor
+    var editor2 = new E('#div1')
+    editor2.create()
+    //  editor2.txt.html
 
+    // 5、预览图片
+    $('#inputCover').on('change', function () {
+        var url = URL.createObjectURL(this.files[0])
+        $('.article_cover').attr('src', url)
+    })
 
+    // 6、点击修改按钮/存为草稿按钮发送Ajax请求更改文章数据
+    $('.btn').on('click', function (e) {
+        // 6.1阻止默认提交行为
+        e.preventDefault()
+        // 6.2准备数据
+        var data = new FormData($('#form').get(0))
+        data.append('id', obj.id)
+        data.append('content', editor2.txt.text())
+        // 6.2.1通过e.target判断当前点击的按钮是修改还是存为草稿
+        if ($(e.target).hasClass('btn-edit')) { //如果当前点击的对象中有btn-edit的类，即为修改按钮
+            data.append('state', '已发布')
+        } else { //否则为存为草稿
+            data.append('state', '草稿')
+        }
+        // 6.3、发送请求
+        $.ajax({
+            type: 'post',
+            url: BigNew.article_edit,
+            data: data,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                if (res.code == 200) {
+                    // 6.4、修改成功后，返回上一页
+                    window.history.back()
+                }
+            }
+        })
+    })
+
+    /*  // 6、点击修改按钮发送Ajax请求更改文章数据
+     $('.btn-edit').on('click', function (e) {
+         // 6.1阻止默认提交行为
+         e.preventDefault()
+         // 6.2准备数据
+         var data = new FormData($('#form').get(0))
+         data.append('id', obj.id)
+         data.append('content', editor2.txt.text())
+         data.append('state', '已发布')
+         // 6.3、发送请求
+         $.ajax({
+             type: 'post',
+             url: BigNew.article_edit,
+             data: data,
+             contentType: false,
+             processData: false,
+             success: function (res) {
+                 if (res.code == 200) {
+                     // 6.4、修改成功后，返回上一页
+                     window.history.back()
+                 }
+             }
+         })
+     })
+ 
+     // 7、点击存为草稿按钮发送Ajax请求更改文章数据
+     $('.btn-draft').on('click', function (e) {
+         // 7.1阻止默认提交行为
+         e.preventDefault()
+         // 7.2准备数据
+         var data = new FormData($('#form').get(0))
+         data.append('id', obj.id)
+         data.append('content', editor2.txt.text())
+         data.append('state', '草稿')
+         // 7.3、发送请求
+         $.ajax({
+             type: 'post',
+             url: BigNew.article_edit,
+             data: data,
+             contentType: false,
+             processData: false,
+             success: function (res) {
+                 if (res.code == 200) {
+                     // 7.4、修改成功后，返回上一页
+                     window.history.back()
+                 }
+             }
+         })
+     }) */
 
 })
