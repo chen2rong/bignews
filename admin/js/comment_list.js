@@ -80,6 +80,42 @@ $(function () {
         })
     })
 
+    // 5、通过评论
+    /* $('tbody').on('click', '.btn-pass', function () {
+        var _this = this
+        // 5.1向通过评论的接口发送请求
+        $.ajax({
+            type: 'post',
+            url: BigNew.comment_pass,
+            data: {
+                id: $(this).data('id')// 5.2获取点击通过按钮的评论的id
+            },
+            success: function (res) {
+                if (res.code == 200) {
+                    // 5、3通过后更新评论转态
+                    $(_this).parent().prev().text(res.msg)
+                }
+            }
+        })
+    }) */
 
+    $('tbody').on('click', '.btn-warning', function () {
+        var _this = this
+        // 5.1向通过评论的接口发送请求
+        $.ajax({
+            type: 'post',
+            url: $(this).hasClass('btn-pass') ? BigNew.comment_pass : BigNew.comment_reject,
+            data: {
+                id: $(this).data('id')// 5.2获取点击通过按钮的评论的id
+            },
+            success: function (res) {
+                console.log(res);
+                if (res.code == 200) {
+                    // 5、3通过后更新评论转态
+                    $(_this).parent().prev().text(res.msg)
+                }
+            }
+        })
+    })
 
 })
