@@ -47,8 +47,9 @@ $(function () {
     // 3、点击input表单显示时间控件
     jeDate("#testico", {
         format: "YYYY-MM-DD",
-        isTime: false,
-        minDate: "2014-09-19 00:00:00"
+        zIndex: 20999,
+        isTime: false
+        // minDate: "2014-09-19 00:00:00"
     })
 
     // 4、使用wangEditor富文本
