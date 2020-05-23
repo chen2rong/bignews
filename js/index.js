@@ -65,7 +65,7 @@ $(function () {
         type: 'get',
         url: BigNew.latest_comment,
         success: function (res) {
-            console.log(res);
+            // console.log(res);
             if (res.code == 200) {
                 // 5.1将数据与模板引擎绑定
                 var htmlStr = template('comment', res)
@@ -80,7 +80,7 @@ $(function () {
         type: 'get',
         url: BigNew.index_attention,
         success: function (res) {
-            console.log(res);
+            // console.log(res);
             if (res.code == 200) {
                 // 6.1将数据与模板引擎绑定
                 var htmlStr = template('attention', res)

@@ -28,6 +28,7 @@
         index_rank: baseURL + '/index/rank', //文章热门
         latest_comment: baseURL + '/index/latest_comment', //最新评论
         index_attention: baseURL + '/index/attention', //焦点关注 
+        index_search: baseURL + '/index/search',//文章搜索
     };
     // 向外暴露对象
     w.BigNew = BigNew
